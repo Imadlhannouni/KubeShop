@@ -10,6 +10,7 @@ import termios
 import struct
 import fcntl
 import signal
+import markdown
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
