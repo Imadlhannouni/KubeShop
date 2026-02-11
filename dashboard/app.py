@@ -1,11 +1,72 @@
 from flask import Flask, render_template, jsonify
+from flask_socketio import SocketIO
 import os
 import subprocess
 import markdown
+import pty
+import select
+import termios
+import struct
+import fcntl
+import shlex
+import eventlet
+
+# Monkey patch for eventlet
+eventlet.monkey_patch()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, async_mode='eventlet')
 
 LABS_DIR = os.path.abspath("../labs")
+
+# Terminal Managment
+fd = None
+child_pid = None
+
+def set_winsize(fd, row, col, xpix=0, ypix=0):
+    winsize = struct.pack("HHHH", row, col, xpix, ypix)
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, winsize)
+
+def read_and_forward_pty_output(fd, socket):
+    max_read_bytes = 1024 * 20
+    while True:
+        socketio.sleep(0.01)
+        if fd:
+            timeout_sec = 0
+            (data_ready, _, _) = select.select([fd], [], [], timeout_sec)
+            if data_ready:
+                output = os.read(fd, max_read_bytes).decode(errors='ignore')
+                socket.emit('output', {'output': output})
+
+@socketio.on('connect', namespace='/pty')
+def connect():
+    global fd, child_pid
+    if child_pid:
+        # Already started
+        return
+
+    # Create pty
+    (child_pid, fd) = pty.fork()
+    if child_pid == 0:
+        # Child process
+        subprocess.run(["bash"])
+    else:
+        # Parent process
+        set_winsize(fd, 24, 80)
+        socketio.start_background_task(target=read_and_forward_pty_output, fd=fd, socket=socketio)
+
+@socketio.on('input', namespace='/pty')
+def input(data):
+    if fd:
+        os.write(fd, data['input'].encode())
+
+@socketio.on('resize', namespace='/pty')
+def resize(data):
+    if fd:
+        set_winsize(fd, data['rows'], data['cols'])
+
+# --- Dashboard Routes ---
 
 def get_labs():
     labs = []
@@ -46,7 +107,6 @@ def verify(lab_id):
         return jsonify({"success": False, "output": "No check script found."})
         
     try:
-        # Run check script
         result = subprocess.run([check_script], capture_output=True, text=True, timeout=10)
         return jsonify({
             "success": result.returncode == 0,
@@ -57,4 +117,4 @@ def verify(lab_id):
 
 if __name__ == '__main__':
     print("Starting KubeShop Dashboard on http://localhost:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)

@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KubeShop Labs</title>
+    <!-- Xterm.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <!-- Socket.io -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
     <style>
         :root {
             --bg-color: #1a1b26;
@@ -14,6 +22,7 @@
             --error-color: #f7768e;
             --code-bg: #24283b;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
@@ -21,7 +30,9 @@
             margin: 0;
             display: flex;
             height: 100vh;
+            overflow: hidden;
         }
+
         .sidebar {
             width: 250px;
             background-color: var(--sidebar-color);
@@ -30,10 +41,12 @@
             border-right: 1px solid #333;
             flex-shrink: 0;
         }
+
         .sidebar h2 {
             color: var(--accent-color);
             margin-top: 0;
         }
+
         .nav-link {
             display: block;
             padding: 10px;
@@ -43,16 +56,35 @@
             margin-bottom: 5px;
             transition: background 0.2s;
         }
-        .nav-link:hover, .nav-link.active {
+
+        .nav-link:hover,
+        .nav-link.active {
             background-color: rgba(122, 162, 247, 0.1);
             color: var(--accent-color);
         }
-        .main-content {
+
+        /* Layout for Main Content & Terminal */
+        .content-wrapper {
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-content {
+            flex: 1;
             padding: 40px;
             overflow-y: auto;
-            max-width: 1000px;
+            border-bottom: 1px solid #333;
         }
+
+        .terminal-container {
+            height: 40%;
+            background-color: #000;
+            padding: 10px;
+            overflow: hidden;
+        }
+
         /* Markdown Styles */
         pre {
             background-color: var(--code-bg);
@@ -60,9 +92,11 @@
             border-radius: 5px;
             overflow-x: auto;
         }
+
         code {
             font-family: 'Fira Code', monospace;
         }
+
         blockquote {
             border-left: 4px solid var(--accent-color);
             margin: 0;
@@ -70,6 +104,7 @@
             background: rgba(122, 162, 247, 0.05);
             padding: 10px;
         }
+
         /* Verify Button */
         .verify-btn {
             background-color: var(--accent-color);
@@ -81,26 +116,30 @@
             border-radius: 5px;
             cursor: pointer;
             position: fixed;
-            bottom: 30px;
+            top: 20px;
             right: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
         }
+
         .verify-btn:hover {
             transform: scale(1.05);
         }
-        .verify-btn:active {
-            transform: scale(0.95);
-        }
+
         /* Modal */
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
+            z-index: 2000;
         }
+
         .modal-content {
             background: var(--bg-color);
             padding: 30px;
@@ -110,6 +149,7 @@
             position: relative;
             border: 1px solid #444;
         }
+
         .close-btn {
             position: absolute;
             top: 10px;
@@ -117,10 +157,19 @@
             cursor: pointer;
             font-size: 24px;
         }
-        .success { color: var(--success-color); border-color: var(--success-color); }
-        .error { color: var(--error-color); border-color: var(--error-color); }
+
+        .success {
+            color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .error {
+            color: var(--error-color);
+            border-color: var(--error-color);
+        }
     </style>
 </head>
+
 <body>
     <div class="sidebar">
         <h2>🚀 KubeShop</h2>
@@ -133,10 +182,53 @@
         {% endfor %}
     </div>
 
-    <div class="main-content">
-        {% block content %}{% endblock %}
+    <div class="content-wrapper">
+        <div class="main-content">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="terminal-container" id="terminal"></div>
     </div>
 
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+    <script>
+        // Global Terminal Init
+        var term = new Terminal({
+            theme: {
+                background: '#000000',
+                foreground: '#ffffff',
+                cursor: '#7aa2f7'
+            },
+            fontFamily: 'Fira Code, monospace',
+            fontSize: 14,
+            cursorBlink: true
+        });
+        var fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(document.getElementById('terminal'));
+        fitAddon.fit();
+
+        // Connect to Backend
+        var socket = io.connect('/pty');
+
+        socket.on('connect', function () {
+            term.write('\r\n🚀 Connected to Web Terminal. Type commands below!\r\n');
+            socket.emit('resize', { cols: term.cols, rows: term.rows });
+        });
+
+        socket.on('output', function (data) {
+            term.write(data.output);
+        });
+
+        term.onData(function (data) {
+            socket.emit('input', { input: data });
+        });
+
+        window.addEventListener('resize', () => {
+            fitAddon.fit();
+            socket.emit('resize', { cols: term.cols, rows: term.rows });
+        });
+    </script>
+    {% endblock %}
 </body>
+
 </html>

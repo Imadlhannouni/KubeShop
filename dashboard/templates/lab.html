@@ -17,6 +17,9 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Inherit Terminal Logic from Layout -->
+{{ super() }}
+
 <script>
     function runVerification() {
         const modal = document.getElementById('resultModal');

@@ -8,13 +8,13 @@
     <h3>How to use this dashboard:</h3>
     <ol>
         <li>Select a Lab from the left menu.</li>
-        <li>Read the instructions in this window.</li>
-        <li>Open your terminal and execute the commands.</li>
+        <li>Read the instructions in the top pane.</li>
+        <li><b>Type commands in the Terminal below!</b> 👇</li>
         <li>Click the floating <b>Verify Lab</b> button when you are done.</li>
     </ol>
 </div>
+{% endblock %}
 
-<p style="margin-top: 50px; color: #666;">
-    <i>Tip: Keep this window open side-by-side with your terminal.</i>
-</p>
+{% block scripts %}
+{{ super() }}
 {% endblock %}
