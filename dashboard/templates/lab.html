@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="instructions">
+    {{ content | safe }}
+</div>
+
+<button class="verify-btn" onclick="runVerification()">✅ Verify Lab</button>
+
+<div id="resultModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Verifying...</h2>
+        <pre id="modalOutput">Please wait...</pre>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function runVerification() {
+        const modal = document.getElementById('resultModal');
+        const title = document.getElementById('modalTitle');
+        const output = document.getElementById('modalOutput');
+
+        modal.style.display = 'flex';
+        title.innerText = "Running Checks...";
+        title.className = "";
+        output.innerText = "waiting for script...";
+
+        fetch('/api/verify/{{ lab_id }}')
+            .then(response => response.json())
+            .then(data => {
+                output.innerText = data.output;
+                if (data.success) {
+                    title.innerText = "🎉 Lab Passed!";
+                    title.className = "success";
+                    document.querySelector('.modal-content').style.borderColor = "#9ece6a";
+                } else {
+                    title.innerText = "❌ Verification Failed";
+                    title.className = "error";
+                    document.querySelector('.modal-content').style.borderColor = "#f7768e";
+                }
+            })
+            .catch(err => {
+                title.innerText = "Error";
+                output.innerText = err;
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('resultModal').style.display = 'none';
+        document.querySelector('.modal-content').style.borderColor = "#444";
+    }
+</script>
+{% endblock %}
