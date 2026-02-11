@@ -41,6 +41,27 @@ This file is your map. Follow the labs in order.
     - **Goal**: Configure Liveness and Readiness probes to fix stuck apps.
     - **Verify**: Run `./labs/09-liveness/check.sh`
 
-## 🟠 Module 3: Networking (Coming Soon)
-*Services and Ingress*
-...
+## 🟠 Module 3: Networking
+*Services and External Access*
+
+- [ ] **[Lab 11: ClusterIP Service](./labs/11-clusterip/instructions.md)**
+    - **Goal**: Create internal stable IP for Catalog.
+    - **Verify**: Run `./labs/11-clusterip/check.sh`
+
+- [ ] **[Lab 12: NodePort Service](./labs/12-nodeport/instructions.md)**
+    - **Goal**: Expose Frontend to your host machine.
+    - **Verify**: Run `./labs/12-nodeport/check.sh`
+
+- [ ] **[Lab 14: Ingress](./labs/14-ingress/instructions.md)**
+    - **Goal**: Expose app via `kubeshop.local` domain.
+    - **Verify**: Run `./labs/14-ingress/check.sh`
+
+- [ ] **[Lab 16: Deny All Traffic](./labs/16-netpol-deny/instructions.md)**
+    - **Goal**: Implement Zero Trust (Lockdown).
+    - **Verify**: Run `./labs/16-netpol-deny/check.sh`
+
+- [ ] **[Lab 17: Allow Traffic](./labs/17-netpol-allow/instructions.md)**
+    - **Goal**: Explicitly allow Frontend -> Catalog.
+    - **Verify**: Run `./labs/17-netpol-allow/check.sh`
+
+

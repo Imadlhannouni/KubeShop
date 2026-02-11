@@ -18,7 +18,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode='eventlet')
 
-LABS_DIR = os.path.abspath("../labs")
+# Fix path to be relative to this script, not the CWD
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LABS_DIR = os.path.join(BASE_DIR, "labs")
 
 # Terminal Managment
 fd = None
