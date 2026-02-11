@@ -1,24 +1,33 @@
-.PHONY: install setup run clean docker-build
+.PHONY: install setup run clean docker-build venv
+
+VENV := .venv
+PYTHON := $(VENV)/bin/python3
+PIP := $(VENV)/bin/pip
 
 # Default target
 all: install run
 
-# Install Python dependencies
-install:
-	@echo "📦 Installing Python dependencies..."
-	pip install -r requirements.txt
+# Create virtual environment
+venv:
+	@echo "🔧 Creating virtual environment..."
+	python3 -m venv $(VENV)
 
-# Setup the environment (currently just install, but extensible)
+# Install Python dependencies inside venv
+install: venv
+	@echo "📦 Installing Python dependencies..."
+	$(PIP) install -r requirements.txt
+
+# Setup the environment
 setup: install
 	@echo "✅ Setup complete. Run 'make run' to start the dashboard."
 
-# Run the Web Dashboard
+# Run the Web Dashboard using venv python
 run:
 	@echo "🚀 Starting KubeShop Dashboard..."
 	@echo "👉 Open http://localhost:5000 in your browser"
-	python3 dashboard/app.py
+	$(PYTHON) dashboard/app.py
 
-# Helper to build all docker images for the app (for manual testing)
+# Helper to build all docker images
 docker-build:
 	@echo "🐳 Building Docker images..."
 	docker build -t kubeshop/catalog:v1 src/catalog
@@ -29,4 +38,5 @@ docker-build:
 
 # Clean up
 clean:
+	rm -rf $(VENV)
 	find . -type d -name "__pycache__" -exec rm -rf {} +
