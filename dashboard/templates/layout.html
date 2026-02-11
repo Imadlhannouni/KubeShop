@@ -207,8 +207,10 @@
         term.open(document.getElementById('terminal'));
         fitAddon.fit();
 
-        // Connect to Backend
-        var socket = io.connect('/pty');
+        // Connect to Backend with forced Websocket transport
+        var socket = io.connect('/pty', {
+            transports: ['websocket', 'polling']
+        });
 
         socket.on('connect', function () {
             term.write('\r\n🚀 Connected to Web Terminal. Type commands below!\r\n');

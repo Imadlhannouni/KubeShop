@@ -119,4 +119,5 @@ def verify(lab_id):
 
 if __name__ == '__main__':
     print("Starting KubeShop Dashboard on http://localhost:5000")
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    # Debug mode with reloader can break SocketIO. Disabling reloader.
+    socketio.run(app, debug=True, use_reloader=False, host='0.0.0.0', port=5000)
