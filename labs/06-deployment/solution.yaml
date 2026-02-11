@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+      - name: catalog
+        image: kubeshop/catalog:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
