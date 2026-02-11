@@ -1,3 +1,7 @@
+import eventlet
+# Monkey patch for eventlet must be first
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 import os
@@ -9,10 +13,6 @@ import termios
 import struct
 import fcntl
 import shlex
-import eventlet
-
-# Monkey patch for eventlet
-eventlet.monkey_patch()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
