@@ -64,4 +64,56 @@ This file is your map. Follow the labs in order.
     - **Goal**: Explicitly allow Frontend -> Catalog.
     - **Verify**: Run `./labs/17-netpol-allow/check.sh`
 
+## 🟣 Module 4: Configuration
+*The 12-Factor App*
+
+- [ ] **[Lab 18: Environment Variables](./labs/18-env-vars/instructions.md)**
+    - **Goal**: Inject `CATALOG_URL` dynamically.
+    - **Verify**: Run `./labs/18-env-vars/check.sh`
+
+- [ ] **[Lab 19: ConfigMaps](./labs/19-configmaps/instructions.md)**
+    - **Goal**: Centralize configuration in a file.
+    - **Verify**: Run `./labs/19-configmaps/check.sh`
+
+- [ ] **[Lab 20: Secrets](./labs/20-secrets/instructions.md)**
+    - **Goal**: Manage sensitive API keys.
+    - **Verify**: Run `./labs/20-secrets/check.sh`
+
+## 📦 Module 5: Storage
+*Persistence*
+
+- [ ] **[Lab 21: Ephemeral Storage](./labs/21-emptydir/instructions.md)**
+    - **Goal**: Understand `emptyDir`.
+    - **Verify**: Run `./labs/21-emptydir/check.sh`
+
+- [ ] **[Lab 22: PersistentVolumes](./labs/22-pv/instructions.md)**
+    - **Goal**: Create a manual PV.
+    - **Verify**: Run `./labs/22-pv/check.sh`
+
+- [ ] **[Lab 23: PVCs](./labs/23-pvc/instructions.md)**
+    - **Goal**: Claim storage for your app.
+    - **Verify**: Run `./labs/23-pvc/check.sh`
+
+- [ ] **[Lab 24: Using Storage](./labs/24-storageclass/instructions.md)**
+    - **Goal**: Mount PVC to a Pod.
+    - **Verify**: Run `./labs/24-storageclass/check.sh`
+
+## 🛳️ Module 5: Automation (Helm)
+*Package Management*
+
+- [ ] **[Lab 25: Helm Basics](./labs/25-helm-basics/instructions.md)**
+    - **Goal**: Install Redis with Helm.
+    - **Verify**: Run `./labs/25-helm-basics/check.sh`
+
+- [ ] **[Lab 26: Create a Chart](./labs/26-create-chart/instructions.md)**
+    - **Goal**: Package KubeShop as a Chart.
+    - **Verify**: Run `./labs/26-create-chart/check.sh`
+
+- [ ] **[Lab 27: Helm Values](./labs/27-helm-values/instructions.md)**
+    - **Goal**: Parameterize your deployment.
+    - **Verify**: Run `./labs/27-helm-values/check.sh`
+
+
+
+
 

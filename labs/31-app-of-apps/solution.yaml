@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeshop
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Imadlhannouni/KubeShop.git
+    targetRevision: master
+    path: charts/kubeshop
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

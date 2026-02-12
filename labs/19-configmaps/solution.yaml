@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  catalog.url: "http://catalog-service"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: kubeshop/frontend:v1
+        ports:
+        - containerPort: 3000
+        env:
+        - name: CATALOG_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: catalog.url

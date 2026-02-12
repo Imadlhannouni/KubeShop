@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: kubeshop/order:v1
+        volumeMounts:
+        - name: logs-vol
+          mountPath: /var/log
+      volumes:
+      - name: logs-vol
+        emptyDir: {}
